@@ -7,7 +7,7 @@
     <div class="cu-card cu-card-body">
         <h2 class="cu-page-title mb-1">{{ __('staff.submit_leave_request') }}</h2>
 
-        <form action="{{ route('department-head.leave-requests.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="leave-request-form" action="{{ route('department-head.leave-requests.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-4">
@@ -84,6 +84,8 @@
                     <p class="cu-form-error">{{ $message }}</p>
                 @enderror
             </div>
+
+            <x-signature-pad targets="leave-request-form" :required="true" />
 
             <div class="flex justify-end gap-3">
                 <a href="{{ route('department-head.leave-requests.index') }}" class="cu-btn-secondary">{{ __('common.cancel') }}</a>

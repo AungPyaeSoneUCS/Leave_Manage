@@ -61,6 +61,14 @@
             <p class="text-base text-slate-800 mt-1">{{ $leaveRequest->reason }}</p>
         </div>
 
+        @if($leaveRequest->staff_signature)
+            <div class="mb-6">
+                <p class="cu-muted">{{ __('common.applicant_signature') }}</p>
+                <img src="{{ $leaveRequest->staff_signature }}" alt="{{ __('common.signature') }}"
+                     class="mt-1 w-36 h-20 object-contain border border-slate-200 rounded-lg bg-white p-1">
+            </div>
+        @endif
+
         @if($leaveRequest->attachment_path)
             @php $attachments = json_decode($leaveRequest->attachment_path, true) ?: [$leaveRequest->attachment_path]; @endphp
             <div class="mb-6">
@@ -154,15 +162,24 @@
                         <p class="text-base text-slate-800 mt-1">{{ $leaveRequest->review_remarks }}</p>
                     </div>
                 @endif
+                @if($leaveRequest->reviewer_signature)
+                    <div class="mt-4">
+                        <p class="cu-muted">{{ __('common.signature') }}</p>
+                        <img src="{{ $leaveRequest->reviewer_signature }}" alt="{{ __('common.signature') }}"
+                             class="mt-2 w-40 h-20 object-contain border border-slate-200 rounded-lg bg-white p-1">
+                    </div>
+                @endif
             </div>
         </div>
 
         @if($leaveRequest->isPending() && $leaveRequest->current_approval_level === 1)
             <div class="border-t border-slate-100 pt-6">
                 <h3 class="cu-section-title mb-4">{{ __('common.actions') }}</h3>
+                <x-signature-pad targets="approve-form,reject-form" :required="true" />
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <form action="{{ route('department-head.approvals.approve', $leaveRequest) }}" method="POST" class="flex-1">
+                    <form id="approve-form" action="{{ route('department-head.approvals.approve', $leaveRequest) }}" method="POST" class="flex-1">
                         @csrf
+                        <input type="hidden" name="signature" value="">
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('common.approve') }}</label>
                             <input type="text" name="remarks"
@@ -175,8 +192,9 @@
                         <button type="submit" class="cu-btn-success w-full">{{ __('department_head.agree_and_forward') }}</button>
                     </form>
 
-                    <form action="{{ route('department-head.approvals.reject', $leaveRequest) }}" method="POST" class="flex-1">
+                    <form id="reject-form" action="{{ route('department-head.approvals.reject', $leaveRequest) }}" method="POST" class="flex-1">
                         @csrf
+                        <input type="hidden" name="signature" value="">
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('common.reject') }}</label>
                             <input type="text" name="remarks"

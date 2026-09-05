@@ -47,7 +47,7 @@
                             </span>
                         </td>
                         <td>
-                            <a href="{{ route('admin.staff.show', $member) }}" class="cu-link">{{ __('common.view') }}</a>
+                            <a href="{{ route('admin.staff.show', $member) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.view') }}</a>
                         </td>
                     </tr>
                 @empty

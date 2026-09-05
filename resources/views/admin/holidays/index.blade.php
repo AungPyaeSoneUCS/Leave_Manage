@@ -81,12 +81,12 @@
                                         <span class="text-sm text-slate-500">—</span>
                                     @endif
                                 </td>
-                                <td class="space-x-3">
-                                    <a href="{{ route('admin.holidays.edit', $holiday) }}" class="cu-link">{{ __('common.edit') }}</a>
+                                <td class="flex items-center justify-center gap-2">
+                                    <a href="{{ route('admin.holidays.edit', $holiday) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.edit') }}</a>
                                     <form action="{{ route('admin.holidays.destroy', $holiday) }}" method="POST" class="inline" data-confirm="{{ __('admin.delete_holiday_confirm') }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="cu-link-danger">{{ __('common.delete') }}</button>
+                                        <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.delete') }}</button>
                                     </form>
                                 </td>
                             </tr>

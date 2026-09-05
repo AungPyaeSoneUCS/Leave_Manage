@@ -114,7 +114,7 @@
                             </td>
                             <td>
                                 <a href="{{ route('department-head.staff.show', $member) }}"
-                                    class="cu-link">{{ __('common.view') }}</a>
+                                    class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.view') }}</a>
                             </td>
                         </tr>
                     @empty

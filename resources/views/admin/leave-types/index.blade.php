@@ -45,12 +45,12 @@
                                 {{ $leaveType->is_active ? __('common.active') : __('common.inactive') }}
                             </span>
                         </td>
-                        <td class="space-x-3">
-                            <a href="{{ route('admin.leave-types.edit', $leaveType) }}" class="cu-link">{{ __('common.edit') }}</a>
+                        <td class="flex items-center justify-center gap-2">
+                            <a href="{{ route('admin.leave-types.edit', $leaveType) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.edit') }}</a>
                             <form action="{{ route('admin.leave-types.destroy', $leaveType) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="cu-link-danger"
+                                <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs"
                                         data-confirm="{{ __('admin.delete_this_leave_type') }}">{{ __('common.delete') }}</button>
                             </form>
                         </td>

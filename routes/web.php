@@ -143,7 +143,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('staff')->name('staff.')->middleware('role:staff')->group(function () {
         Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
         Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
-        Route::resource('leave-requests', LeaveRequestController::class)->except(['destroy']);
+        Route::resource('leave-requests', LeaveRequestController::class);
         Route::post('/leave-requests/{leave_request}/cancel', [LeaveRequestController::class, 'cancel'])->name('leave-requests.cancel');
         Route::get('/leave-types', [StaffLeaveTypeController::class, 'index'])->name('leave-types.index');
         Route::get('/leave-types/{leaveType}', [StaffLeaveTypeController::class, 'show'])->name('leave-types.show');
@@ -163,7 +163,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/approvals/{leave_request}/approve', [DepartmentHeadApprovalController::class, 'approve'])->name('approvals.approve');
         Route::post('/approvals/{leave_request}/reject', [DepartmentHeadApprovalController::class, 'reject'])->name('approvals.reject');
         Route::post('/approvals/{leave_request}/revoke', [DepartmentHeadApprovalController::class, 'revoke'])->name('approvals.revoke');
-        Route::resource('leave-requests', LeaveRequestController::class)->except(['destroy']);
+        Route::resource('leave-requests', LeaveRequestController::class);
         Route::post('/leave-requests/{leave_request}/cancel', [LeaveRequestController::class, 'cancel'])->name('leave-requests.cancel');
         Route::get('/profile', [DepartmentProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [DepartmentProfileController::class, 'update'])->name('profile.update');

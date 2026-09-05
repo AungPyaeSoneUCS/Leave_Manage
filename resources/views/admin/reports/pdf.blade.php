@@ -371,44 +371,66 @@
                     $perBarW = $groupW / 2;
                 @endphp
                 @if ($count > 0)
+                    @php
+                        $chartRows = [];
+                        foreach ($labels as $idx => $label) {
+                            $chartRows[] = [
+                                'label' => $label,
+                                'used' => (float) ($used[$idx] ?? 0),
+                                'remaining' => (float) ($remaining[$idx] ?? 0),
+                            ];
+                        }
+                        $tiles = array_chunk($chartRows, 10);
+                    @endphp
                     <div class="chart-section">
                         <div class="chart-title">{{ __('admin.balance_report') }} — {{ __('common.used_days') }} vs {{ __('common.remaining_days') }}</div>
-                        <div class="chart-wrap">
-                            <svg width="{{ $svgW }}" height="{{ $svgH }}" viewBox="0 0 {{ $svgW }} {{ $svgH }}" xmlns="http://www.w3.org/2000/svg">
-                                @for ($i = 0; $i <= 4; $i++)
-                                    @php
-                                        $y = $padT + ($plotH * $i / 4);
-                                        $tick = round($maxVal * (1 - $i / 4), 1);
-                                    @endphp
-                                    <line x1="{{ $padL }}" y1="{{ $y }}" x2="{{ $svgW - $padR }}" y2="{{ $y }}" stroke="#e2e8f0" stroke-width="1"/>
-                                    <text x="{{ $padL - 6 }}" y="{{ $y + 3 }}" text-anchor="end" font-size="8" fill="#64748b" font-family="notosansmyanmar">{{ $tick }}</text>
-                                @endfor
+                        @foreach ($tiles as $tileIndex => $tile)
+                            @php
+                                $tileCount = count($tile);
+                                $slot = $plotW / max($tileCount, 1);
+                                $groupW = min(88, max(32, $slot * 0.7));
+                                $perBarW = $groupW / 2;
+                            @endphp
+                            <div {{ $tileIndex > 0 ? 'style="page-break-before: auto; margin-top: 14px;"' : '' }}>
+                                <div class="chart-wrap">
+                                    <svg width="{{ $svgW }}" height="{{ $svgH }}" viewBox="0 0 {{ $svgW }} {{ $svgH }}" xmlns="http://www.w3.org/2000/svg">
+                                        @for ($i = 0; $i <= 4; $i++)
+                                            @php
+                                                $y = $padT + ($plotH * $i / 4);
+                                                $tick = round($maxVal * (1 - $i / 4), 1);
+                                            @endphp
+                                            <line x1="{{ $padL }}" y1="{{ $y }}" x2="{{ $svgW - $padR }}" y2="{{ $y }}" stroke="#e2e8f0" stroke-width="1"/>
+                                            <text x="{{ $padL - 6 }}" y="{{ $y + 3 }}" text-anchor="end" font-size="8" fill="#64748b" font-family="notosansmyanmar">{{ $tick }}</text>
+                                        @endfor
 
-                                <line x1="{{ $padL }}" y1="{{ $padT }}" x2="{{ $padL }}" y2="{{ $padT + $plotH }}" stroke="#94a3b8" stroke-width="1"/>
-                                <line x1="{{ $padL }}" y1="{{ $padT + $plotH }}" x2="{{ $svgW - $padR }}" y2="{{ $padT + $plotH }}" stroke="#94a3b8" stroke-width="1"/>
+                                        <line x1="{{ $padL }}" y1="{{ $padT }}" x2="{{ $padL }}" y2="{{ $padT + $plotH }}" stroke="#94a3b8" stroke-width="1"/>
+                                        <line x1="{{ $padL }}" y1="{{ $padT + $plotH }}" x2="{{ $svgW - $padR }}" y2="{{ $padT + $plotH }}" stroke="#94a3b8" stroke-width="1"/>
 
-                                @foreach ($labels as $idx => $label)
-                                    @php
-                                        $u = (float) ($used[$idx] ?? 0);
-                                        $r = (float) ($remaining[$idx] ?? 0);
-                                        $hU = ($u / $maxVal) * $plotH;
-                                        $hR = ($r / $maxVal) * $plotH;
-                                        $x0 = $padL + ($idx * $slot) + (($slot - $groupW) / 2);
-                                        $xU = $x0;
-                                        $xR = $x0 + $perBarW;
-                                        $yU = $padT + $plotH - $hU;
-                                        $yR = $padT + $plotH - $hR;
-                                    @endphp
-                                    <rect x="{{ round($xU, 2) }}" y="{{ round($yU, 2) }}" width="{{ round($perBarW, 2) }}" height="{{ round(max($hU, 0), 2) }}" fill="{{ $colors[0] ?? '#ef4444' }}" rx="2"/>
-                                    <rect x="{{ round($xR, 2) }}" y="{{ round($yR, 2) }}" width="{{ round($perBarW, 2) }}" height="{{ round(max($hR, 0), 2) }}" fill="{{ $colors[1] ?? '#22c55e' }}" rx="2"/>
+                                        @foreach ($tile as $tIdx => $row)
+                                            @php
+                                                $u = $row['used'];
+                                                $r = $row['remaining'];
+                                                $hU = ($u / $maxVal) * $plotH;
+                                                $hR = ($r / $maxVal) * $plotH;
+                                                $label = $row['label'];
+                                                $x0 = $padL + ($tIdx * $slot) + (($slot - $groupW) / 2);
+                                                $xU = $x0;
+                                                $xR = $x0 + $perBarW;
+                                                $yU = $padT + $plotH - $hU;
+                                                $yR = $padT + $plotH - $hR;
+                                            @endphp
+                                            <rect x="{{ round($xU, 2) }}" y="{{ round($yU, 2) }}" width="{{ round($perBarW, 2) }}" height="{{ round(max($hU, 0), 2) }}" fill="{{ $colors[0] ?? '#ef4444' }}" rx="2"/>
+                                            <rect x="{{ round($xR, 2) }}" y="{{ round($yR, 2) }}" width="{{ round($perBarW, 2) }}" height="{{ round(max($hR, 0), 2) }}" fill="{{ $colors[1] ?? '#22c55e' }}" rx="2"/>
 
-                                    <text x="{{ round($xU + $perBarW / 2, 2) }}" y="{{ round($yU - 4, 2) }}" text-anchor="middle" font-size="8" fill="#334155" font-weight="bold" font-family="notosansmyanmar">{{ $u }}</text>
-                                    <text x="{{ round($xR + $perBarW / 2, 2) }}" y="{{ round($yR - 4, 2) }}" text-anchor="middle" font-size="8" fill="#334155" font-weight="bold" font-family="notosansmyanmar">{{ $r }}</text>
+                                            <text x="{{ round($xU + $perBarW / 2, 2) }}" y="{{ round($yU - 4, 2) }}" text-anchor="middle" font-size="8" fill="#334155" font-weight="bold" font-family="notosansmyanmar">{{ $u }}</text>
+                                            <text x="{{ round($xR + $perBarW / 2, 2) }}" y="{{ round($yR - 4, 2) }}" text-anchor="middle" font-size="8" fill="#334155" font-weight="bold" font-family="notosansmyanmar">{{ $r }}</text>
 
-                                    <text x="{{ round($x0 + $groupW / 2, 2) }}" y="{{ $padT + $plotH + 18 }}" text-anchor="middle" font-size="7" fill="#475569" font-family="notosansmyanmar">{{ mb_strlen($label) > 14 ? mb_substr($label, 0, 13).'…' : $label }}</text>
-                                @endforeach
-                            </svg>
-                        </div>
+                                            <text x="{{ round($x0 + $groupW / 2, 2) }}" y="{{ $padT + $plotH + 18 }}" text-anchor="middle" font-size="7" fill="#475569" font-family="notosansmyanmar">{{ mb_strlen($label) > 14 ? mb_substr($label, 0, 13).'…' : $label }}</text>
+                                        @endforeach
+                                    </svg>
+                                </div>
+                            </div>
+                        @endforeach
                         <table class="chart-legend">
                             <tr>
                                 <td>

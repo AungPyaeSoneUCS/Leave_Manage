@@ -54,19 +54,19 @@
                                 {{ $admin->is_active ? __('common.active') : __('common.inactive') }}
                             </span>
                         </td>
-                        <td class="space-x-3 flex items-center justify-center">
-                            <a href="{{ route('super-admin.admins.edit', $admin) }}" class="cu-link">{{ __('common.edit') }}</a>
+                        <td class="flex items-center justify-center gap-2">
+                            <a href="{{ route('super-admin.admins.edit', $admin) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.edit') }}</a>
                             @if($admin->id !== auth()->id())
                                 <form action="{{ route('super-admin.admins.toggle-active', $admin) }}" method="POST" class="inline">
                                     @csrf
-                                    <button type="submit" class="cu-link">
+                                    <button type="submit" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">
                                         {{ $admin->is_active ? __('common.deactivate') : __('common.activate') }}
                                     </button>
                                 </form>
                                 <form action="{{ route('super-admin.admins.destroy', $admin) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="cu-link-danger"
+                                    <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs"
                                             data-confirm="{{ __('super_admin.delete_this_admin') }}">{{ __('common.delete') }}</button>
                                 </form>
                             @endif

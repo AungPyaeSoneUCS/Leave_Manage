@@ -46,6 +46,51 @@
         </div>
     </div>
 
+    <div class="cu-card cu-card-body">
+        <form method="GET" action="{{ route('admin.users.index') }}" id="user-filter-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+                <label for="user-search" class="cu-label">{{ __('common.search_with_name') }}</label>
+                <input type="text" name="search" id="user-search" list="user-name-suggestions" value="{{ request('search') }}" placeholder="{{ __('common.search') }}..." class="cu-input" autocomplete="off">
+                <datalist id="user-name-suggestions">
+                    @foreach($nameSuggestions as $suggestion)
+                        <option value="{{ $suggestion }}"></option>
+                    @endforeach
+                </datalist>
+            </div>
+            <div>
+                <label for="user-filter-role" class="cu-label">{{ __('common.role') }}</label>
+                <select name="role" id="user-filter-role" class="cu-select">
+                    <option value="">{{ __('common.all_roles') }}</option>
+                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>{{ __('common.role.admin') }}</option>
+                    <option value="department_head" {{ request('role') == 'department_head' ? 'selected' : '' }}>{{ __('common.role.department_head') }}</option></option>
+                    <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>{{ __('common.role.staff') }}</option>
+                </select>
+            </div>
+            <div>
+                <label for="user-filter-department" class="cu-label">{{ __('common.department') }}</label>
+                <select name="department_id" id="user-filter-department" class="cu-select">
+                    <option value="">{{ __('common.all_departments') }}</option>
+                    @foreach($departments as $department)
+                        <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
+                            {{ app()->getLocale() == 'my' ? ($department->name_mm ?? $department->name) : $department->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="user-filter-position" class="cu-label">{{ __('common.position') }}</label>
+                <select name="position" id="user-filter-position" class="cu-select">
+                    <option value="">{{ __('common.all_positions') }}</option>
+                    @foreach($positions as $en => $mm)
+                        <option value="{{ $en }}" {{ request('position') == $en ? 'selected' : '' }}>
+                            {{ app()->getLocale() == 'my' ? ($mm ?: $en) : $en }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </form>
+    </div>
+
     <div class="cu-table-wrap overflow-x-auto">
         <table class="cu-table">
                 <thead>
@@ -55,10 +100,6 @@
                             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => $sort === 'name' && $direction === 'asc' ? 'desc' : 'asc'])) }}"
                                class="inline-flex items-center gap-1 hover:text-primary-600">
                                 {{ __('common.name') }}
-                                <span class="inline-flex flex-col leading-none">
-                                    <span class="{{ $sort === 'name' && $direction === 'asc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▲</span>
-                                    <span class="{{ $sort === 'name' && $direction === 'desc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▼</span>
-                                </span>
                             </a>
                         </th>
                         <th>{{ __('common.email') }}</th>
@@ -66,40 +107,24 @@
                             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['sort' => 'role', 'direction' => $sort === 'role' && $direction === 'asc' ? 'desc' : 'asc'])) }}"
                                class="inline-flex items-center gap-1 hover:text-primary-600">
                                 {{ __('common.role') }}
-                                <span class="inline-flex flex-col leading-none">
-                                    <span class="{{ $sort === 'role' && $direction === 'asc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▲</span>
-                                    <span class="{{ $sort === 'role' && $direction === 'desc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▼</span>
-                                </span>
                             </a>
                         </th>
                         <th>
                             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['sort' => 'department', 'direction' => $sort === 'department' && $direction === 'asc' ? 'desc' : 'asc'])) }}"
                                class="inline-flex items-center gap-1 hover:text-primary-600">
                                 {{ __('common.department') }}
-                                <span class="inline-flex flex-col leading-none">
-                                    <span class="{{ $sort === 'department' && $direction === 'asc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▲</span>
-                                    <span class="{{ $sort === 'department' && $direction === 'desc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▼</span>
-                                </span>
                             </a>
                         </th>
                         <th>
                             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['sort' => 'position', 'direction' => $sort === 'position' && $direction === 'asc' ? 'desc' : 'asc'])) }}"
                                class="inline-flex items-center gap-1 hover:text-primary-600">
                                 {{ __('common.position') }}
-                                <span class="inline-flex flex-col leading-none">
-                                    <span class="{{ $sort === 'position' && $direction === 'asc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▲</span>
-                                    <span class="{{ $sort === 'position' && $direction === 'desc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▼</span>
-                                </span>
                             </a>
                         </th>
                         <th>
                             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['sort' => 'staff_id', 'direction' => $sort === 'staff_id' && $direction === 'asc' ? 'desc' : 'asc'])) }}"
                                class="inline-flex items-center gap-1 hover:text-primary-600">
                                 {{ __('common.staff_id') }}
-                                <span class="inline-flex flex-col leading-none">
-                                    <span class="{{ $sort === 'staff_id' && $direction === 'asc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▲</span>
-                                    <span class="{{ $sort === 'staff_id' && $direction === 'desc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▼</span>
-                                </span>
                             </a>
                         </th>
                         <th>{{ __('common.phone') }}</th>
@@ -107,10 +132,6 @@
                             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['sort' => 'is_active', 'direction' => $sort === 'is_active' && $direction === 'asc' ? 'desc' : 'asc'])) }}"
                                class="inline-flex items-center gap-1 hover:text-primary-600">
                                 {{ __('common.status') }}
-                                <span class="inline-flex flex-col leading-none">
-                                    <span class="{{ $sort === 'is_active' && $direction === 'asc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▲</span>
-                                    <span class="{{ $sort === 'is_active' && $direction === 'desc' ? 'text-primary-600 font-bold' : 'text-slate-400' }}">▼</span>
-                                </span>
                             </a>
                         </th>
                         <th>{{ __('common.actions') }}</th>
@@ -156,14 +177,14 @@
                                 {{ $user->is_active ? __('common.staff.active') : __('common.staff.inactive') }}
                             </span>
                         </td>
-                        <td class="space-x-3 flex items-center justify-center">
-                            <a href="{{ route('admin.users.edit', $user) }}" class="cu-link">{{ __('common.edit') }}</a>
-                            <a href="{{ route('admin.staff.show', $user) }}" class="cu-link">{{ __('common.view') }}</a>
+                        <td class="flex items-center justify-center gap-2">
+                            <a href="{{ route('admin.users.edit', $user) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.edit') }}</a>
+                            <a href="{{ route('admin.staff.show', $user) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.view') }}</a>
                             @if($user->id !== auth()->id())
                                 <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="cu-link-danger"
+                                    <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs"
                                             data-confirm="{{ __('admin.delete_this_user') }}">{{ __('common.delete') }}</button>
                                 </form>
                             @endif
@@ -179,3 +200,24 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    <script>
+        const userFilterForm = document.getElementById('user-filter-form');
+        const userSearchInput = document.getElementById('user-search');
+        let userFilterTimer;
+
+        if (userSearchInput) {
+            userSearchInput.addEventListener('input', function () {
+                clearTimeout(userFilterTimer);
+                userFilterTimer = setTimeout(() => userFilterForm.submit(), 500);
+            });
+        }
+
+        if (userFilterForm) {
+            userFilterForm.querySelectorAll('select').forEach(function (select) {
+                select.addEventListener('change', () => userFilterForm.submit());
+            });
+        }
+    </script>
+@endpush

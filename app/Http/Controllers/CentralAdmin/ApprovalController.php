@@ -56,13 +56,15 @@ class ApprovalController extends Controller
 
         $validated = $request->validate([
             'remarks' => 'nullable|string|max:500',
+            'signature' => 'required|string',
         ]);
 
         $result = $this->leaveWorkflowService->processCentralApproval(
             $leaveRequest,
             auth()->user(),
             'approved',
-            $validated['remarks'] ?? null
+            $validated['remarks'] ?? null,
+            $validated['signature']
         );
 
         if ($result === 'pending_super_admin') {
@@ -89,13 +91,15 @@ class ApprovalController extends Controller
 
         $validated = $request->validate([
             'remarks' => 'required|string|max:500',
+            'signature' => 'required|string',
         ]);
 
         $this->leaveWorkflowService->processCentralApproval(
             $leaveRequest,
             auth()->user(),
             'rejected',
-            $validated['remarks']
+            $validated['remarks'],
+            $validated['signature']
         );
 
         $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'rejected'));

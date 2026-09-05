@@ -57,13 +57,16 @@ class ApprovalController extends Controller
 
         $validated = $request->validate([
             'remarks' => 'nullable|string|max:500',
+            'signature' => 'required|string',
         ]);
 
         $this->leaveWorkflowService->processApproval(
             $leaveRequest,
             auth()->user(),
             'approved',
-            $validated['remarks'] ?? null
+            $validated['remarks'] ?? null,
+            null,
+            $validated['signature']
         );
 
         $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'pending_hr'));
@@ -87,13 +90,16 @@ class ApprovalController extends Controller
 
         $validated = $request->validate([
             'remarks' => 'required|string|max:500',
+            'signature' => 'required|string',
         ]);
 
         $this->leaveWorkflowService->processApproval(
             $leaveRequest,
             auth()->user(),
             'rejected',
-            $validated['remarks']
+            $validated['remarks'],
+            null,
+            $validated['signature']
         );
 
         $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'rejected'));

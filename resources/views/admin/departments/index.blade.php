@@ -34,12 +34,12 @@
                         <td>{{ $department->description ?: '—' }}</td>
                         <td>{{ $department->head ? app()->getLocale() == 'my' ? $department->head->name_mm ?? $department->head->name : $department->head->name : __('common.not_assigned') }}</td>
                         <td>{{ my_number($department->users_count) }}</td>
-                        <td class="space-x-3">
-                            <a href="{{ route('admin.departments.edit', $department) }}" class="cu-link">{{ __('common.edit') }}</a>
+                        <td class="flex items-center justify-center gap-2">
+                            <a href="{{ route('admin.departments.edit', $department) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.edit') }}</a>
                             <form action="{{ route('admin.departments.destroy', $department) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="cu-link-danger"
+                                <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs"
                                         data-confirm="{{ __('admin.delete_this_department') }}">{{ __('common.delete') }}</button>
                             </form>
                         </td>

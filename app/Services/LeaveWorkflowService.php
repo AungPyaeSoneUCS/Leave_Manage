@@ -14,12 +14,13 @@ class LeaveWorkflowService
         private LeaveBalanceService $leaveBalanceService,
     ) {}
 
-    public function processApproval(LeaveRequest $leaveRequest, User $reviewer, string $status, ?string $remarks = null, ?int $nextApprovalLevel = null): LeaveRequest
+    public function processApproval(LeaveRequest $leaveRequest, User $reviewer, string $status, ?string $remarks = null, ?int $nextApprovalLevel = null, ?string $signature = null): LeaveRequest
     {
         if ($status === 'rejected') {
             $leaveRequest->status = 'rejected';
             $leaveRequest->reviewer_id = $reviewer->id;
             $leaveRequest->review_remarks = $remarks;
+            $leaveRequest->reviewer_signature = $signature;
             $leaveRequest->reviewed_at = Carbon::now();
 
             $leaveRequest->save();
@@ -29,6 +30,7 @@ class LeaveWorkflowService
 
         $leaveRequest->reviewer_id = $reviewer->id;
         $leaveRequest->review_remarks = $remarks;
+        $leaveRequest->reviewer_signature = $signature;
         $leaveRequest->reviewed_at = Carbon::now();
 
         if ($nextApprovalLevel !== null) {
@@ -57,13 +59,15 @@ class LeaveWorkflowService
      *
      * Returns the notification key for the requester: 'approved', 'rejected' or 'pending_super_admin'.
      */
-    public function processCentralApproval(LeaveRequest $leaveRequest, User $approver, string $status, ?string $remarks = null): string
+    public function processCentralApproval(LeaveRequest $leaveRequest, User $approver, string $status, ?string $remarks = null, ?string $signature = null): string
     {
         if ($status === 'rejected') {
             if ($approver->isSuperAdmin()) {
                 $leaveRequest->super_admin_id = $approver->id;
+                $leaveRequest->super_admin_signature = $signature;
             } else {
                 $leaveRequest->hr_id = $approver->id;
+                $leaveRequest->hr_signature = $signature;
             }
 
             $leaveRequest->status = 'rejected';
@@ -77,6 +81,7 @@ class LeaveWorkflowService
         if ($approver->isSuperAdmin()) {
             $leaveRequest->status = 'approved';
             $leaveRequest->super_admin_id = $approver->id;
+            $leaveRequest->super_admin_signature = $signature;
             $leaveRequest->review_remarks = $remarks;
             $leaveRequest->reviewed_at = Carbon::now();
 
@@ -93,6 +98,7 @@ class LeaveWorkflowService
 
         $leaveRequest->current_approval_level = 3;
         $leaveRequest->hr_id = $approver->id;
+        $leaveRequest->hr_signature = $signature;
         $leaveRequest->review_remarks = $remarks;
         $leaveRequest->reviewed_at = Carbon::now();
         $leaveRequest->save();

@@ -106,12 +106,17 @@
                                     {{ __('common.' . $request->status) }}
                                 </span>
                             </td>
-                            <td class="space-x-3">
-                                <a href="{{ route('department-head.leave-requests.show', $request) }}" class="cu-link">{{ __('common.view') }}</a>
+                            <td class="flex items-center justify-center gap-2">
+                                <a href="{{ route('department-head.leave-requests.show', $request) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.view') }}</a>
                                 @if($request->isPending())
                                     <form action="{{ route('department-head.leave-requests.cancel', $request) }}" method="POST" class="inline">
                                         @csrf
-                                        <button type="submit" class="cu-link-danger" data-confirm="{{ __('staff.cancel_this_request') }}">{{ __('common.cancel') }}</button>
+                                        <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs" data-confirm="{{ __('staff.cancel_this_request') }}">{{ __('common.cancel') }}</button>
+                                    </form>
+                                    <form action="{{ route('department-head.leave-requests.destroy', $request) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs" data-confirm="{{ __('staff.delete_this_request') }}">{{ __('common.delete') }}</button>
                                     </form>
                                 @endif
                             </td>

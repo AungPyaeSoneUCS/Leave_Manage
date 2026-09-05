@@ -166,15 +166,49 @@
                         <p class="text-base text-slate-800 mt-1">{{ $leaveRequest->review_remarks }}</p>
                     </div>
                 @endif
+                @if($leaveRequest->staff_signature || $leaveRequest->reviewer_signature || $leaveRequest->hr_signature || $leaveRequest->super_admin_signature)
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        @if($leaveRequest->staff_signature)
+                            <div>
+                                <p class="cu-muted">{{ __('common.applicant_signature') }}</p>
+                                <img src="{{ $leaveRequest->staff_signature }}" alt="{{ __('common.signature') }}"
+                                     class="mt-1 w-36 h-20 object-contain border border-slate-200 rounded-lg bg-white p-1">
+                            </div>
+                        @endif
+                        @if($leaveRequest->reviewer_signature)
+                            <div>
+                                <p class="cu-muted">{{ __('common.department_head_signature') }}</p>
+                                <img src="{{ $leaveRequest->reviewer_signature }}" alt="{{ __('common.signature') }}"
+                                     class="mt-1 w-36 h-20 object-contain border border-slate-200 rounded-lg bg-white p-1">
+                            </div>
+                        @endif
+                        @if($leaveRequest->hr_signature)
+                            <div>
+                                <p class="cu-muted">{{ __('common.signature') }} ({{ __('common.hr_central_admin') }})</p>
+                                <img src="{{ $leaveRequest->hr_signature }}" alt="{{ __('common.signature') }}"
+                                     class="mt-1 w-36 h-20 object-contain border border-slate-200 rounded-lg bg-white p-1">
+                            </div>
+                        @endif
+                        @if($leaveRequest->super_admin_signature)
+                            <div>
+                                <p class="cu-muted">{{ __('common.signature') }} ({{ __('common.super_admin') }})</p>
+                                <img src="{{ $leaveRequest->super_admin_signature }}" alt="{{ __('common.signature') }}"
+                                     class="mt-1 w-36 h-20 object-contain border border-slate-200 rounded-lg bg-white p-1">
+                            </div>
+                        @endif
+                    </div>
+                @endif
             </div>
         </div>
 
         @can('approve', $leaveRequest)
             <div class="border-t border-slate-100 pt-6">
                 <h3 class="cu-section-title mb-4">{{ __('common.actions') }}</h3>
+                <x-signature-pad targets="approve-form,reject-form" :required="true" />
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <form action="{{ route('central-admin.approvals.approve', $leaveRequest) }}" method="POST" class="flex-1">
+                    <form id="approve-form" action="{{ route('central-admin.approvals.approve', $leaveRequest) }}" method="POST" class="flex-1">
                         @csrf
+                        <input type="hidden" name="signature" value="">
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('common.approve') }}</label>
                             <input type="text" name="remarks"
@@ -189,8 +223,9 @@
                         </button>
                     </form>
 
-                    <form action="{{ route('central-admin.approvals.reject', $leaveRequest) }}" method="POST" class="flex-1">
+                    <form id="reject-form" action="{{ route('central-admin.approvals.reject', $leaveRequest) }}" method="POST" class="flex-1">
                         @csrf
+                        <input type="hidden" name="signature" value="">
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('common.reject') }}</label>
                             <input type="text" name="remarks"

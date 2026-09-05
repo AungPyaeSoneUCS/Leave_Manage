@@ -70,6 +70,7 @@ class LeaveRequestController extends Controller
             'start_date' => 'nullable|date|after_or_equal:today',
             'end_date' => 'nullable|date',
             'reason' => 'required|string|max:500',
+            'signature' => 'required|string',
             'attachments' => [
                 'nullable',
                 'array',
@@ -156,6 +157,7 @@ class LeaveRequestController extends Controller
             'end_date' => $validated['end_date'],
             'total_days' => $totalDays,
             'reason' => $validated['reason'],
+            'staff_signature' => $validated['signature'],
             'status' => 'pending',
             'current_approval_level' => auth()->user()->isDepartmentHead() || auth()->user()->require_admin_approval ? 2 : 1,
             'duty_exchange_user_id' => $validated['duty_exchange_user_id'] ?? null,
@@ -375,5 +377,24 @@ class LeaveRequestController extends Controller
         $leaveRequest->update(['status' => 'cancelled']);
 
         return back()->with('success', __('flash.cancel_success'));
+    }
+
+    public function destroy(LeaveRequest $leaveRequest)
+    {
+        if (Gate::denies('delete', $leaveRequest)) {
+            abort(403);
+        }
+
+        if ($leaveRequest->attachment_path) {
+            $paths = json_decode($leaveRequest->attachment_path, true) ?: [];
+            foreach ($paths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        $leaveRequest->delete();
+
+        return redirect()->route($this->routePrefix().'.index')
+            ->with('success', __('flash.request_deleted'));
     }
 }

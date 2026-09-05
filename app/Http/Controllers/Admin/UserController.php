@@ -30,6 +30,29 @@ class UserController extends Controller
 
         $query = User::with('department')->where('role', '!=', 'super_admin');
 
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('staff_id', 'like', "%{$search}%");
+            });
+        }
+
+        if ($role = $request->query('role')) {
+            $query->where('role', $role);
+        }
+
+        if ($departmentId = $request->query('department_id')) {
+            $query->where('department_id', $departmentId);
+        }
+
+        if ($position = $request->query('position')) {
+            $query->where(function ($q) use ($position) {
+                $q->where('position', $position)
+                    ->orWhere('position_mm', $position);
+            });
+        }
+
         if ($sort === 'department') {
             $query = $query->select('users.*')
                 ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
@@ -47,7 +70,16 @@ class UserController extends Controller
 
         $users = $query->paginate(15)->withQueryString();
 
-        return view('admin.users.index', compact('users', 'sort', 'direction'));
+        $departments = Department::get();
+        $positions = Config::get('positions', []);
+
+        $nameSuggestions = User::where('role', '!=', 'super_admin')
+            ->get(['name', 'name_mm'])
+            ->flatMap(fn ($user) => array_values(array_filter([$user->name, $user->name_mm])))
+            ->unique()
+            ->values();
+
+        return view('admin.users.index', compact('users', 'sort', 'direction', 'departments', 'positions', 'nameSuggestions'));
     }
 
     public function create()
